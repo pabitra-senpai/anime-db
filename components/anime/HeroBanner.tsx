@@ -43,12 +43,19 @@ export function HeroBanner({ animes }: { animes: AnimeSummary[] }) {
   }
 
   function handleTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
+    const touch = e.touches[0];
+    if (!touch) return;
+    touchStartX.current = touch.clientX;
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
     if (touchStartX.current === null) return;
-    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    const touch = e.changedTouches[0];
+    if (!touch) {
+      touchStartX.current = null;
+      return;
+    }
+    const delta = touch.clientX - touchStartX.current;
     if (Math.abs(delta) > 40) {
       goTo(active + (delta < 0 ? 1 : -1));
     }
