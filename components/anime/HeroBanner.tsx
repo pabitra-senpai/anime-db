@@ -63,6 +63,7 @@ export function HeroBanner({ animes }: { animes: AnimeSummary[] }) {
   }
 
   const anime = slides[active];
+  if (!anime) return null;
 
   return (
     <section
