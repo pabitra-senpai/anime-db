@@ -19,7 +19,7 @@ export function AnimeCard({ anime }: { anime: AnimeSummary }) {
   return (
     <Link
       href={`/anime/${anime.slug}`}
-      className="focus-ring group block w-[160px] shrink-0 sm:w-[180px]"
+      className="focus-ring group block w-[134px] shrink-0 sm:w-[180px]"
     >
       <div className="relative aspect-[2/3] w-full overflow-hidden rounded-md bg-bg-elevated ring-1 ring-border transition-transform duration-150 group-hover:-translate-y-1 group-hover:ring-accent">
         {anime.posterUrl ? (
@@ -27,7 +27,7 @@ export function AnimeCard({ anime }: { anime: AnimeSummary }) {
             src={anime.posterUrl}
             alt={anime.title}
             fill
-            sizes="180px"
+            sizes="(min-width: 640px) 180px, 134px"
             className="object-cover transition-transform duration-150 group-hover:scale-105"
           />
         ) : (
