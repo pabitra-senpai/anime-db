@@ -1,0 +1,291 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  authId      String   @unique // external auth provider subject id
+  username    String   @unique
+  displayName String?
+  preferences Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  favorites UserFavorite[]
+  watchlist UserWatchlist[]
+  history   UserHistory[]
+  ratings   UserRating[]
+  progress  UserEpisodeProgress[]
+}
+
+model Anime {
+  id            String   @id @default(cuid())
+  anilistId     Int      @unique
+  malId         Int?
+  kitsuId       String?
+  simklId       Int?
+  tmdbId        Int?
+  imdbId        String?
+  slug          String   @unique
+  title         String
+  englishTitle  String?
+  nativeTitle   String?
+  romajiTitle   String?
+  synopsis      String?
+  posterUrl     String?
+  bannerUrl     String?
+  trailerUrl    String?
+  format        String
+  status        String
+  season        String?
+  seasonYear    Int?
+  episodes      Int?
+  durationMinutes Int?
+  source        String?
+  score         Int?
+  popularity    Int?
+  rank          Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastSyncedAt  DateTime?
+
+  titles          AnimeTitle[]
+  genres          AnimeGenre[]
+  studios         AnimeStudio[]
+  producers       AnimeProducer[]
+  characters      CharacterVoiceActor[]
+  staff           AnimeStaff[]
+  episodesList    Episode[]
+  relationsFrom   RelatedAnime[]        @relation("RelationFrom")
+  relationsTo     RelatedAnime[]        @relation("RelationTo")
+  recommendations Recommendation[]      @relation("RecFrom")
+  favoritedBy     UserFavorite[]
+  watchlistedBy   UserWatchlist[]
+  historyOf       UserHistory[]
+  ratings         UserRating[]
+  episodeProgress UserEpisodeProgress[]
+
+  @@index([status])
+  @@index([seasonYear])
+  @@index([score])
+}
+
+model AnimeTitle {
+  id               String @id @default(cuid())
+  animeId          String
+  anime            Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  title            String
+  type             String // english | romaji | native | synonym
+  normalizedTitle  String
+
+  @@index([normalizedTitle])
+}
+
+model Genre {
+  id     String       @id @default(cuid())
+  name   String       @unique
+  animes AnimeGenre[]
+}
+
+model AnimeGenre {
+  animeId String
+  genreId String
+  anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, genreId])
+}
+
+model Studio {
+  id     String        @id @default(cuid())
+  name   String        @unique
+  animes AnimeStudio[]
+}
+
+model AnimeStudio {
+  animeId String
+  studioId String
+  anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  studio  Studio @relation(fields: [studioId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, studioId])
+}
+
+model Producer {
+  id     String          @id @default(cuid())
+  name   String          @unique
+  animes AnimeProducer[]
+}
+
+model AnimeProducer {
+  animeId    String
+  producerId String
+  anime      Anime    @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  producer   Producer @relation(fields: [producerId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, producerId])
+}
+
+model Character {
+  id        String @id @default(cuid())
+  anilistId Int    @unique
+  name      String
+  imageUrl  String?
+
+  voiceActors CharacterVoiceActor[]
+}
+
+model VoiceActor {
+  id        String @id @default(cuid())
+  anilistId Int    @unique
+  name      String
+  imageUrl  String?
+  language  String?
+
+  characters CharacterVoiceActor[]
+}
+
+model CharacterVoiceActor {
+  animeId      String
+  characterId  String
+  voiceActorId String
+  role         String? // MAIN | SUPPORTING
+
+  anime      Anime      @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  character  Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  voiceActor VoiceActor @relation(fields: [voiceActorId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, characterId, voiceActorId])
+}
+
+model Staff {
+  id        String @id @default(cuid())
+  anilistId Int    @unique
+  name      String
+  imageUrl  String?
+
+  animes AnimeStaff[]
+}
+
+model AnimeStaff {
+  animeId String
+  staffId String
+  role    String?
+
+  anime Anime @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  staff Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, staffId])
+}
+
+model Episode {
+  id            String   @id @default(cuid())
+  animeId       String
+  anime         Anime    @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  number        Int
+  title         String?
+  synopsis      String?
+  airDate       DateTime?
+  thumbnailUrl  String?
+
+  @@unique([animeId, number])
+}
+
+model RelatedAnime {
+  id           String @id @default(cuid())
+  fromAnimeId  String
+  toAnimeId    String
+  relationType String // SEQUEL | PREQUEL | SIDE_STORY | ...
+
+  fromAnime Anime @relation("RelationFrom", fields: [fromAnimeId], references: [id], onDelete: Cascade)
+  toAnime   Anime @relation("RelationTo", fields: [toAnimeId], references: [id], onDelete: Cascade)
+
+  @@unique([fromAnimeId, toAnimeId, relationType])
+}
+
+model Recommendation {
+  id             String @id @default(cuid())
+  fromAnimeId    String
+  toAnimeId      String
+  weight         Int    @default(0)
+
+  fromAnime Anime @relation("RecFrom", fields: [fromAnimeId], references: [id], onDelete: Cascade)
+
+  @@unique([fromAnimeId, toAnimeId])
+}
+
+model UserFavorite {
+  userId    String
+  animeId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime Anime @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, animeId])
+}
+
+model UserWatchlist {
+  userId    String
+  animeId   String
+  status    String   @default("PLAN_TO_WATCH") // WATCHING | COMPLETED | PLAN_TO_WATCH | DROPPED | ON_HOLD
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime Anime @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, animeId])
+}
+
+model UserHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  animeId   String
+  viewedAt  DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime Anime @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, viewedAt])
+}
+
+model UserRating {
+  userId    String
+  animeId   String
+  score     Int // 1-10
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime Anime @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, animeId])
+}
+
+model UserEpisodeProgress {
+  userId       String
+  animeId      String
+  episodeNumber Int
+  watchedAt    DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime Anime @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, animeId, episodeNumber])
+}
+
+model MetadataSyncLog {
+  id        String   @id @default(cuid())
+  provider  String // anilist | jikan | kitsu | simkl
+  status    String // SUCCESS | FAILURE
+  message   String?
+  createdAt DateTime @default(now())
+
+  @@index([provider, createdAt])
+}
