@@ -64,7 +64,7 @@ export default async function AnimeDetailsPage({ params }: PageProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
       </div>
 
-      <Container className="-mt-24 space-y-10 pb-16 sm:-mt-32">
+      <Container className="relative z-10 -mt-24 space-y-10 pb-16 sm:-mt-32">
         <div className="flex flex-col gap-6 sm:flex-row">
           <div className="relative aspect-[2/3] w-40 shrink-0 overflow-hidden rounded-lg ring-1 ring-border sm:w-56">
             {anime.posterUrl && (
