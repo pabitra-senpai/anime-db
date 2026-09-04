@@ -1,7 +1,11 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 import { PlayCircle } from "lucide-react";
 import type { Episode } from "@/lib/api/types";
 import { Card } from "@/components/ui/Card";
+
+const PAGE_SIZE = 24;
 
 function formatAirDate(airDate: string | null): string | null {
   if (!airDate) return null;
@@ -11,19 +15,39 @@ function formatAirDate(airDate: string | null): string | null {
 }
 
 export function EpisodeList({ episodes }: { episodes: Episode[] }) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
   if (!episodes.length) return null;
+
+  const visibleEpisodes = episodes.slice(0, visibleCount);
+  const hasMore = visibleCount < episodes.length;
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-fg sm:text-xl">Episodes</h2>
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-lg font-semibold text-fg sm:text-xl">Episodes</h2>
+        <span className="text-xs text-fg-subtle">{episodes.length} total</span>
+      </div>
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {episodes.map((ep) => {
+        {visibleEpisodes.map((ep) => {
           const airDate = formatAirDate(ep.airDate);
           return (
             <Card key={`${ep.source}-${ep.number}`} className="flex gap-3 p-3">
               <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-md bg-bg-elevated">
                 {ep.thumbnailUrl ? (
-                  <Image src={ep.thumbnailUrl} alt="" fill sizes="112px" className="object-cover" />
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={ep.thumbnailUrl}
+                    alt=""
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e) => {
+                      // Hide broken thumbnails from unpredictable third-party
+                      // CDN hosts instead of showing a broken-image glyph.
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
                     <PlayCircle className="h-6 w-6 text-fg-subtle" />
@@ -41,6 +65,16 @@ export function EpisodeList({ episodes }: { episodes: Episode[] }) {
           );
         })}
       </div>
+
+      {hasMore && (
+        <button
+          type="button"
+          onClick={() => setVisibleCount((c) => Math.min(c + PAGE_SIZE, episodes.length))}
+          className="focus-ring w-full rounded-md border border-border bg-bg-surface py-2.5 text-sm font-medium text-fg-muted transition-colors hover:bg-bg-elevated hover:text-fg"
+        >
+          Load more ({episodes.length - visibleCount} remaining)
+        </button>
+      )}
     </section>
   );
 }
