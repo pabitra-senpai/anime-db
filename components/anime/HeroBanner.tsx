@@ -68,7 +68,7 @@ export function HeroBanner({ animes }: { animes: AnimeSummary[] }) {
   return (
     <section
       aria-label="Featured anime"
-      className="focus-ring relative -mx-4 h-[280px] overflow-hidden rounded-none sm:mx-0 sm:h-[400px] sm:rounded-xl lg:h-[480px]"
+      className="focus-ring relative -mx-4 h-[clamp(250px,62vw,310px)] overflow-hidden rounded-none sm:mx-0 sm:h-[400px] sm:rounded-xl lg:h-[480px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -98,7 +98,7 @@ export function HeroBanner({ animes }: { animes: AnimeSummary[] }) {
       <div className="absolute inset-0 bg-gradient-to-r from-bg/80 via-transparent to-transparent sm:from-bg/70" />
 
       {/* Content */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-4 sm:max-w-xl sm:gap-4 sm:p-8">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 sm:max-w-xl sm:gap-4 sm:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <ScoreBadge score={anime.score} />
           {FORMAT_LABEL[anime.format] && (
@@ -111,26 +111,26 @@ export function HeroBanner({ animes }: { animes: AnimeSummary[] }) {
           )}
         </div>
 
-        <h1 className="line-clamp-2 text-2xl font-bold text-fg drop-shadow-sm sm:text-4xl">
+        <h1 className="line-clamp-2 text-xl font-bold leading-tight text-fg drop-shadow-sm sm:text-3xl lg:text-4xl">
           {anime.title}
         </h1>
 
         {anime.genres.length > 0 && (
-          <div className="hidden sm:block">
+          <div className="[&_a:nth-child(n+3)]:hidden sm:[&_a:nth-child(n+3)]:inline-block">
             <GenreChips genres={anime.genres.slice(0, 3)} />
           </div>
         )}
 
-        <div className="flex gap-2 pt-1">
+        <div className="flex flex-wrap gap-2 pt-1">
           <Link
             href={`/anime/${anime.slug}`}
-            className="focus-ring inline-flex h-10 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-accent-fg transition-colors duration-150 hover:opacity-90"
+            className="focus-ring inline-flex h-9 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-accent-fg transition-colors duration-150 hover:opacity-90 sm:h-10"
           >
             View details
           </Link>
           <Link
             href={`/anime/${anime.slug}#episodes`}
-            className="focus-ring hidden h-10 items-center justify-center gap-2 rounded-md border border-border px-4 text-sm font-medium text-fg transition-colors duration-150 hover:bg-bg-elevated sm:inline-flex"
+            className="focus-ring inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-border px-3 text-xs font-medium text-fg transition-colors duration-150 hover:bg-bg-elevated sm:h-10 sm:gap-2 sm:px-4 sm:text-sm"
           >
             <Info className="h-4 w-4" />
             More info
@@ -162,7 +162,7 @@ export function HeroBanner({ animes }: { animes: AnimeSummary[] }) {
 
       {/* Dots */}
       {slides.length > 1 && (
-        <div className="absolute bottom-3 right-4 flex gap-1.5 sm:bottom-4">
+        <div className="absolute bottom-16 right-4 flex gap-1.5 sm:bottom-4">
           {slides.map((s, i) => (
             <button
               key={s.id}
