@@ -9,7 +9,13 @@ import { ShareActions } from "@/components/anime/ShareActions";
 import { EpisodeList } from "@/components/anime/EpisodeList";
 import { CastList } from "@/components/anime/CastList";
 import { StaffList } from "@/components/anime/StaffList";
+import { FavoriteButton } from "@/components/anime/FavoriteButton";
+import { WatchlistButton } from "@/components/anime/WatchlistButton";
+import { RatingWidget } from "@/components/anime/RatingWidget";
 import { getAnimeBySlug } from "@/lib/api/metadata-service";
+import { getGuestId } from "@/lib/auth/session";
+import { getLibraryState } from "@/lib/db/user-library";
+import type { WatchlistStatus } from "@/lib/actions/user-library";
 
 interface PageProps {
   params: { slug: string };
@@ -47,6 +53,8 @@ export default async function AnimeDetailsPage({ params }: PageProps) {
   const anime = await getAnimeBySlug(params.slug);
   if (!anime) notFound();
 
+  const library = await getLibraryState(anime.anilistId, getGuestId());
+
   return (
     <div>
       <div className="relative h-[220px] w-full overflow-hidden bg-bg-elevated sm:h-[320px]">
@@ -83,7 +91,25 @@ export default async function AnimeDetailsPage({ params }: PageProps) {
 
             <GenreChips genres={anime.genres} limit={8} />
 
-            <ShareActions title={anime.title} trailerUrl={anime.trailerUrl} />
+            <div className="flex flex-wrap items-center gap-2">
+              <FavoriteButton
+                anilistId={anime.anilistId}
+                slug={anime.slug}
+                initialIsFavorited={library.isFavorited}
+              />
+              <WatchlistButton
+                anilistId={anime.anilistId}
+                slug={anime.slug}
+                initialStatus={library.watchlistStatus as WatchlistStatus | null}
+              />
+              <ShareActions title={anime.title} trailerUrl={anime.trailerUrl} />
+            </div>
+
+            <RatingWidget
+              anilistId={anime.anilistId}
+              slug={anime.slug}
+              initialRating={library.rating}
+            />
           </div>
         </div>
 
