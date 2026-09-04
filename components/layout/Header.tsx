@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "./Container";
 import { SearchBar } from "@/components/search/SearchBar";
 import { MobileNav } from "./MobileNav";
@@ -15,8 +16,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur">
       <Container className="flex h-16 items-center gap-4">
-        <Link href="/" className="focus-ring shrink-0 text-lg font-bold tracking-tight text-fg">
-          Anime<span className="text-accent">DB</span>
+        <Link href="/" className="focus-ring shrink-0">
+          <Image
+            src="/assets/animedb-logo.png"
+            alt="AnimeDB"
+            width={120}
+            height={40}
+            className="h-7 w-auto sm:h-9"
+            priority
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
