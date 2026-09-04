@@ -168,7 +168,10 @@ export async function getAnimeBySlug(slug: string): Promise<AnimeDetail | null> 
     });
     if (!data.Media) return null;
     const detail = normalizeDetail(data.Media);
-    void cacheAnime(detail);
+    // Awaited (unlike the list endpoints above) because the anime page's
+    // favorite/watchlist/rating buttons need this row to exist by the time
+    // they render — those actions look it up by anilistId.
+    await cacheAnime(detail);
     return enrichAnimeDetail(detail);
   } catch (err) {
     console.error(`AniList fetch failed for ${slug}, falling back to cache`, err);
