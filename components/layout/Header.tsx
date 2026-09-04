@@ -34,7 +34,7 @@ export function Header() {
         <SearchBar className="ml-auto hidden w-full max-w-xs sm:block" />
 
         <Link
-          href="/profile"
+          href={"/profile" as any}
           className="focus-ring hidden rounded-md px-3 py-2 text-sm text-fg-muted hover:bg-bg-elevated hover:text-fg md:inline-flex"
         >
           Profile
