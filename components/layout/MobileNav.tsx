@@ -32,7 +32,7 @@ export function MobileNav({ links }: { links: { href: string; label: string }[] 
               </Link>
             ))}
             <Link
-              href="{"/profile" as any}
+              href={"/profile" as any}
               onClick={() => setOpen(false)}
               className="focus-ring rounded-md px-3 py-2 text-sm text-fg hover:bg-bg-elevated"
             >
