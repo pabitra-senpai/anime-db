@@ -1,6 +1,6 @@
 <div align="center">
 
-# AnimeDB
+<img src="public/assets/animedb-logo.png" alt="AnimeDB" width="360" />
 
 **An IMDb-style discovery and database platform for anime.**
 
