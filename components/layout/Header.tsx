@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/popular", label: "Popular" },
   { href: "/seasonal", label: "Seasonal" },
   { href: "/top-rated", label: "Top Rated" },
+  { href: "/watchlist", label: "My List" },
 ];
 
 export function Header() {
