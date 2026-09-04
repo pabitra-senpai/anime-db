@@ -21,6 +21,35 @@ export interface AniListMedia {
   trailer: { id: string; site: string } | null;
 }
 
+export interface AniListCharacterEdge {
+  role: string | null;
+  node: {
+    id: number;
+    name: { full: string | null };
+    image: { large: string | null } | null;
+  };
+  voiceActors: {
+    id: number;
+    name: { full: string | null };
+    image: { large: string | null } | null;
+  }[];
+}
+
+export interface AniListStaffEdge {
+  role: string | null;
+  node: {
+    id: number;
+    name: { full: string | null };
+    image: { large: string | null } | null;
+  };
+}
+
+export interface AniListStreamingEpisode {
+  title: string | null;
+  thumbnail: string | null;
+  url: string | null;
+}
+
 export const MEDIA_FIELDS = /* GraphQL */ `
   fragment MediaFields on Media {
     id
@@ -154,6 +183,48 @@ export const MEDIA_BY_ID_QUERY = /* GraphQL */ `
             ...MediaFields
           }
         }
+      }
+      characters(sort: [ROLE, RELEVANCE], perPage: 16) {
+        edges {
+          role
+          node {
+            id
+            name {
+              full
+            }
+            image {
+              large
+            }
+          }
+          voiceActors(language: JAPANESE) {
+            id
+            name {
+              full
+            }
+            image {
+              large
+            }
+          }
+        }
+      }
+      staff(sort: RELEVANCE, perPage: 10) {
+        edges {
+          role
+          node {
+            id
+            name {
+              full
+            }
+            image {
+              large
+            }
+          }
+        }
+      }
+      streamingEpisodes {
+        title
+        thumbnail
+        url
       }
     }
   }
