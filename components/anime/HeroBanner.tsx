@@ -171,8 +171,8 @@ export function HeroBanner({ animes }: { animes: AnimeSummary[] }) {
               aria-current={i === active}
               onClick={() => goTo(i)}
               className={clsx(
-                "h-1.5 rounded-full transition-all duration-150",
-                i === active ? "w-6 bg-accent" : "w-1.5 bg-fg/40 hover:bg-fg/60"
+                "h-2 rounded-full ring-1 ring-bg/50 transition-all duration-150",
+                i === active ? "w-6 bg-accent" : "w-2 bg-fg/70 hover:bg-fg"
               )}
             />
           ))}
