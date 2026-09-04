@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Container } from "@/components/layout/Container";
 import { AnimeRail } from "@/components/anime/AnimeGrid";
 import { AnimeCardSkeleton } from "@/components/ui/Skeleton";
+import { HeroBanner } from "@/components/anime/HeroBanner";
 import { getPopular, getSeasonal, getTopRated, getTrending } from "@/lib/api/metadata-service";
 
 function currentSeason(): { season: "WINTER" | "SPRING" | "SUMMER" | "FALL"; year: number } {
@@ -24,6 +25,17 @@ function RailSkeleton({ title }: { title: string }) {
       </div>
     </section>
   );
+}
+
+function HeroSkeleton() {
+  return (
+    <div className="-mx-4 h-[280px] animate-pulse rounded-none bg-bg-elevated sm:mx-0 sm:h-[400px] sm:rounded-xl lg:h-[480px]" />
+  );
+}
+
+async function HeroSection() {
+  const animes = await getTrending(5);
+  return <HeroBanner animes={animes} />;
 }
 
 async function TrendingRail() {
@@ -57,6 +69,10 @@ async function SeasonalRail() {
 export default function HomePage() {
   return (
     <Container className="space-y-10 py-8">
+      <Suspense fallback={<HeroSkeleton />}>
+        <HeroSection />
+      </Suspense>
+
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-fg sm:text-3xl">Discover your next anime</h1>
         <p className="text-fg-muted">Trending, popular and top-rated anime, all in one place.</p>
