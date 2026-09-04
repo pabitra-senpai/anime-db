@@ -6,6 +6,9 @@ import { ScoreBadge } from "@/components/anime/ScoreBadge";
 import { GenreChips } from "@/components/anime/GenreChips";
 import { AnimeRail } from "@/components/anime/AnimeGrid";
 import { ShareActions } from "@/components/anime/ShareActions";
+import { EpisodeList } from "@/components/anime/EpisodeList";
+import { CastList } from "@/components/anime/CastList";
+import { StaffList } from "@/components/anime/StaffList";
 import { getAnimeBySlug } from "@/lib/api/metadata-service";
 
 interface PageProps {
@@ -110,9 +113,21 @@ export default async function AnimeDetailsPage({ params }: PageProps) {
                 <dt className="text-fg-subtle">Status</dt>
                 <dd className="text-fg">{STATUS_LABEL[anime.status]}</dd>
               </div>
+              {anime.ageRating && (
+                <div>
+                  <dt className="text-fg-subtle">Age Rating</dt>
+                  <dd className="text-fg">{anime.ageRating}</dd>
+                </div>
+              )}
             </dl>
           </section>
         )}
+
+        <CastList cast={anime.cast} />
+
+        <EpisodeList episodes={anime.episodesList} />
+
+        <StaffList staff={anime.staffList} />
 
         {anime.relations.length > 0 && (
           <AnimeRail title="Relations" animes={anime.relations.map((r) => r.anime)} />
