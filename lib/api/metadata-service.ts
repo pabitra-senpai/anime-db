@@ -10,6 +10,8 @@ import {
   type AniListMedia,
 } from "./providers/anilist/queries";
 import { normalizeDetail, normalizeSummary } from "./providers/anilist/normalize";
+import { getCastByMalId, getEpisodesByMalId } from "./providers/jikan";
+import { getEnrichmentByMalId } from "./providers/kitsu";
 import { idFromSlug } from "@/lib/utils/slugify";
 import type { AnimeDetail, AnimeSummary, SearchFilters, SearchResult } from "./types";
 
@@ -167,7 +169,7 @@ export async function getAnimeBySlug(slug: string): Promise<AnimeDetail | null> 
     if (!data.Media) return null;
     const detail = normalizeDetail(data.Media);
     void cacheAnime(detail);
-    return detail;
+    return enrichAnimeDetail(detail);
   } catch (err) {
     console.error(`AniList fetch failed for ${slug}, falling back to cache`, err);
     if (!cached) return null;
@@ -195,6 +197,38 @@ export async function getAnimeBySlug(slug: string): Promise<AnimeDetail | null> 
       studios: [],
       relations: [],
       recommendations: [],
+      episodesList: [],
+      cast: [],
+      staffList: [],
+      ageRating: null,
     };
   }
+}
+
+/**
+ * Fills gaps AniList leaves empty using Jikan/Kitsu as secondary sources.
+ * Runs the three lookups in parallel and is entirely best-effort: every
+ * provider call above already swallows its own errors and returns an
+ * empty/null result, so this function itself cannot throw.
+ */
+async function enrichAnimeDetail(detail: AnimeDetail): Promise<AnimeDetail> {
+  if (!detail.malId) return detail;
+
+  const needsEpisodes = detail.episodesList.length === 0;
+  const needsCast = detail.cast.length === 0;
+  const needsKitsu = !detail.synopsis || detail.ageRating === null;
+
+  const [episodesList, cast, kitsu] = await Promise.all([
+    needsEpisodes ? getEpisodesByMalId(detail.malId) : Promise.resolve(detail.episodesList),
+    needsCast ? getCastByMalId(detail.malId) : Promise.resolve(detail.cast),
+    needsKitsu ? getEnrichmentByMalId(detail.malId) : Promise.resolve(null),
+  ]);
+
+  return {
+    ...detail,
+    episodesList,
+    cast,
+    synopsis: detail.synopsis ?? kitsu?.synopsis ?? null,
+    ageRating: detail.ageRating ?? kitsu?.ageRating ?? null,
+  };
 }

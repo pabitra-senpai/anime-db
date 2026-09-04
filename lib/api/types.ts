@@ -42,6 +42,33 @@ export interface AnimeSummary {
   genres: string[];
 }
 
+export interface Episode {
+  number: number;
+  title: string | null;
+  thumbnailUrl: string | null;
+  airDate: string | null; // ISO date string, when known
+  synopsis: string | null;
+  /** Which provider this episode's data actually came from. */
+  source: "anilist" | "jikan";
+}
+
+export interface CastMember {
+  characterId: number;
+  characterName: string;
+  characterImageUrl: string | null;
+  role: string | null; // MAIN | SUPPORTING | BACKGROUND
+  voiceActorId: number | null;
+  voiceActorName: string | null;
+  voiceActorImageUrl: string | null;
+}
+
+export interface StaffMember {
+  staffId: number;
+  name: string;
+  imageUrl: string | null;
+  role: string | null; // e.g. "Director", "Original Creator"
+}
+
 export interface AnimeDetail extends AnimeSummary {
   synopsis: string | null;
   durationMinutes: number | null;
@@ -52,6 +79,11 @@ export interface AnimeDetail extends AnimeSummary {
     anime: AnimeSummary;
   }[];
   recommendations: AnimeSummary[];
+  episodesList: Episode[];
+  cast: CastMember[];
+  staffList: StaffMember[];
+  /** Kitsu enrichment; null when unavailable or not yet fetched. */
+  ageRating: string | null;
 }
 
 export interface SearchFilters {
